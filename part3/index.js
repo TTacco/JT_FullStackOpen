@@ -1,16 +1,11 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-
 const app = express()
 
-app.use(express.static('build'))
-
 app.use(express.json())
-
 app.use(morgan((tokens, req, res) => {
   if(!(typeof req.params === 'object' && req.params !== null && !Array.isArray(req.params)))
-
   return [
     tokens.method(req, res),
     tokens.url(req, res),
@@ -21,6 +16,7 @@ app.use(morgan((tokens, req, res) => {
   ].join(' ')
 }))
 
+app.use(express.static('build'))
 app.use(cors())
 
 const unknownEndpoint = (request, response) => {
