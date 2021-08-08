@@ -11,7 +11,6 @@
 
 # production
 /*/*/build
-part3/build
 part3/mongo.js
 
 # misc
