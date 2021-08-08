@@ -1,9 +1,12 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
+const PhoneNumber = require('./models/phonenumber')
 
 app.use(express.json())
+
 app.use(morgan((tokens, req, res) => {
   if(!(typeof req.params === 'object' && req.params !== null && !Array.isArray(req.params)))
   return [
@@ -26,6 +29,7 @@ const unknownEndpoint = (request, response) => {
 //app.use(unknownEndpoint)
 
 console.log("INITIALIZING");
+
 
 let data= [
     { 
@@ -60,13 +64,15 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-    response.send(data);
+  PhoneNumber.find({}).then(numbers => {
+    response.json(numbers)
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const idToSearch = Number(request.params.id)
-
-    const person = data.find((p) => p.id === idToSearch);
+    PhoneNumber.findById(request.params.id).then(note => {
+      response.json(note)
+    })
 
     if(person){
         response.send(person);
@@ -89,22 +95,29 @@ const generateID = () => {
 }
 
 app.post('/api/persons', (request, response) => {
-  const newPerson = request.body;  
-  newPerson.id = generateID();
 
-  if (!newPerson.name || !newPerson.number){
+  if (!request.body.name || !request.body.number){
     return response.status(400).json({ 
       error: 'content missing' 
     })
   }
-  else if(data.filter(p => (p.name === newPerson.name)).length){
+  else if(data.filter(p => (p.name === request.body.name)).length){
     return response.status(400).json({ 
       error: 'user already exists' 
     })
   }
 
-  data = data.concat(newPerson)
-  response.json(newPerson);
+  const newPerson = new PhoneNumber({
+    id: Math.floor(1000 * Math.random()),
+    name: request.body.name,
+    number: request.body.number
+  })
+
+  //data = data.concat(newPerson)
+  newPerson.save().then(result => {
+    response.json(newPerson);
+  })
+
 })
 
 
