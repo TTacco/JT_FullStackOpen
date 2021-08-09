@@ -21,8 +21,7 @@ app.use(morgan((tokens, req, res) => {
     tokens.url(req, res),
     tokens.status(req, res),
     tokens.res(req, res, 'content-length'), '-',
-    tokens['response-time'](req, res), 'ms',
-    JSON.stringify(data.find(d => Number(d.id) === Number(req.params.id)))
+    tokens['response-time'](req, res), 'ms'
   ].join(' ')
 }))
 
@@ -35,10 +34,8 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   } 
-
   next(error)
 }
-
 app.use(errorHandler)
 
 
@@ -86,30 +83,37 @@ app.delete('/api/persons/:id', (request, response) => {
     }).catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
-
+app.post('/api/persons', (request, response, next) => {
   if (!request.body.name || !request.body.number){
     return response.status(400).json({ 
       error: 'content missing' 
     })
   }
-  else if(data.filter(p => (p.name === request.body.name)).length){
-    return response.status(400).json({ 
-      error: 'user already exists' 
-    })
-  }
 
-  const newPerson = new PhoneNumber({
-    id: Math.floor(1000 * Math.random()),
-    name: request.body.name,
-    number: request.body.number
-  })
-
-  //data = data.concat(newPerson)
-  newPerson.save().then(result => {
-    response.json(newPerson);
-  })
-
+  PhoneNumber
+    .findOne({name: request.body.name})
+    .then(res => {
+      if(res) {
+        return response.status(303).json({ 
+          error: 'Content of this name already exists '
+        })
+      }
+      else{
+        const newPerson = new PhoneNumber({
+          id: Math.floor(1000 * Math.random()),
+          name: request.body.name,
+          number: request.body.number
+        })
+        
+        newPerson
+          .save()
+          .then(result => result.toJSON())
+          .then(resultFormatted => { 
+            response.json(resultFormatted) 
+          })
+          .catch(error => next(error))
+      }
+    }); 
 })
 
 
