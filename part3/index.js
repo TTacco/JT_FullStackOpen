@@ -7,6 +7,13 @@ const PhoneNumber = require('./models/phonenumber')
 
 app.use(express.json())
 
+/* app.use((request, response) => {
+  console.log(request.body)
+  if (request.body.content === undefined) {    
+    return response.status(400).json({ error: 'content missing' })  
+  }
+}) */
+
 app.use(morgan((tokens, req, res) => {
   if(!(typeof req.params === 'object' && req.params !== null && !Array.isArray(req.params)))
   return [
@@ -22,37 +29,23 @@ app.use(morgan((tokens, req, res) => {
 app.use(express.static('build'))
 app.use(cors())
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
 }
+
+app.use(errorHandler)
+
+
 
 //app.use(unknownEndpoint)
 
 console.log("INITIALIZING");
-
-
-let data= [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
 
 app.get('/', (request, response) => {
   response.send(`<div>BLINDBLINDBLIND</div>`)
@@ -69,30 +62,29 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
-app.get('/api/persons/:id', (request, response) => {
-    PhoneNumber.findById(request.params.id).then(note => {
-      response.json(note)
-    })
-
-    if(person){
-        response.send(person);
-    }
-    else{
-        return response.status(404).send();
-    }
+app.get('/api/persons/:id', (request, response, next) => {
+  PhoneNumber.findById(request.params.id)
+    .then(number => {
+      if (number) {        
+        response.json(number)      
+      } 
+      else {        
+        response.status(404).end()      
+      }    
+    }).catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  data = data.filter(d => d.id !== id)
-
-  response.status(204).end()
+  PhoneNumber.findByIdAndDelete(request.params.id)
+    .then(number => {
+      if (number) {        
+        response.status(204).end()
+      } 
+      else {        
+        response.status(404).end()      
+      }    
+    }).catch(error => next(error))
 })
-
-const generateID = () => {
-  const len = data.length+1; 
-  return len + Math.floor(Math.random() * (len+5));  
-}
 
 app.post('/api/persons', (request, response) => {
 
