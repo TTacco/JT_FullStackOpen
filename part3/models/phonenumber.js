@@ -13,7 +13,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
   })
 
 const phoneNumberSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
+  name: {type: String, required: true, unique: true },
   number: String,
 })
 

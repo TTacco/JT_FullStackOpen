@@ -37,11 +37,10 @@ function App() {
         const newEntry = {
             "name": newName,
             "number": newNumber,
-            "date": new Date().toISOString
         }
 
         const exist = numbers.find(n => n.name.toLowerCase() === newName.toLowerCase());
-        if(exist){
+        if(exist){         
             if (window.confirm('Entry already exists, would you edit?')){
                 numbersService.editNumber(exist.id, newEntry).then((res) => {
                     alert("Successfully edited the entry");

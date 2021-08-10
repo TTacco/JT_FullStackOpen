@@ -56,12 +56,14 @@ app.get('/info', (request, response) => {
                     <div>${new Date()}</div>`);
 })
 
+//Retrieves all phone numbers
 app.get('/api/persons', (request, response) => {
   PhoneNumber.find({}).then(numbers => {
     response.json(numbers)
   })
 })
 
+//Retrieves specific phone number
 app.get('/api/persons/:id', (request, response, next) => {
   PhoneNumber.findById(request.params.id)
     .then(number => {
@@ -72,6 +74,17 @@ app.get('/api/persons/:id', (request, response, next) => {
         response.status(404).end()      
       }    
     }).catch(error => next(error))
+})
+
+
+//Updates the individual
+app.put('/api/persons/:id', (request, response, next) => {
+  PhoneNumber.updateOne(
+    {_id: request.params.id}, 
+    {$set: {number: request.body.number}}
+  )
+  .then(updatedVal => response.json(updatedVal))
+  .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -94,9 +107,8 @@ app.post('/api/persons', (request, response, next) => {
   }
 
     const newPerson = new PhoneNumber({
-    id: Math.floor(1000 * Math.random()),
-    name: request.body.name,
-    number: request.body.number
+      name: request.body.name,
+      number: request.body.number
   })
   
   newPerson
