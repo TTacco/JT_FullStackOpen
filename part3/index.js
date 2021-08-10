@@ -34,6 +34,9 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   } 
+  else if (error.name === 'ValidationError') {    
+    return response.status(400).json({ error: error.message })  
+  }
   next(error)
 }
 app.use(errorHandler)
@@ -90,31 +93,21 @@ app.post('/api/persons', (request, response, next) => {
     })
   }
 
-  PhoneNumber
-    .findOne({name: request.body.name})
-    .then(res => {
-      if(res) {
-        return response.status(303).json({ 
-          error: 'Content of this name already exists '
-        })
-      }
-      else{
-        const newPerson = new PhoneNumber({
-          id: Math.floor(1000 * Math.random()),
-          name: request.body.name,
-          number: request.body.number
-        })
-        
-        newPerson
-          .save()
-          .then(result => result.toJSON())
-          .then(resultFormatted => { 
-            response.json(resultFormatted) 
-          })
-          .catch(error => next(error))
-      }
-    }); 
-})
+    const newPerson = new PhoneNumber({
+    id: Math.floor(1000 * Math.random()),
+    name: request.body.name,
+    number: request.body.number
+  })
+  
+  newPerson
+      .save()
+      .then(result => result.toJSON())
+      .then(resultFormatted => { 
+        response.json(resultFormatted) 
+      })
+      .catch(error => next(error))
+  }
+)
 
 
 const PORT = process.env.PORT || 3001
