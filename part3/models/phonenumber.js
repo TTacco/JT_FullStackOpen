@@ -1,15 +1,15 @@
 const mongoose = require('mongoose')
-const uniqueValidator = require('mongoose-unique-validator');
+const uniqueValidator = require('mongoose-unique-validator')
 
 const url = process.env.MONGODB_URI
 
 console.log('connecting to', url)
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
-    .then(result => {    
-    console.log('connected to MongoDB')  
-  }).catch((error) => {    
-    console.log('error connecting to MongoDB:', error.message)  
+  .then(result => {
+    console.log('connected to MongoDB')
+  }).catch((error) => {
+    console.log('error connecting to MongoDB:', error.message)
   })
 
 const phoneNumberSchema = new mongoose.Schema({
@@ -17,7 +17,7 @@ const phoneNumberSchema = new mongoose.Schema({
   number: String,
 })
 
-phoneNumberSchema.plugin(uniqueValidator);
+phoneNumberSchema.plugin(uniqueValidator)
 
 phoneNumberSchema.set('toJSON', {
   transform: (document, returnedObject) => {
