@@ -1,10 +1,10 @@
-const express = require("express");
-const cors = require("cors");
-const blogRouter = require("./controllers/blog-controller")
-const logger = require("./utils/logger")
-const config = require("./utils/config")
+const express = require('express')
+const cors = require('cors')
+const blogRouter = require('./controllers/blog-controller')
+const logger = require('./utils/logger')
+const config = require('./utils/config')
 const mongoose = require('mongoose')
-const app = express();
+const app = express()
 
 logger.info('connecting to', config.MONGODB_URI)
 
@@ -21,4 +21,4 @@ app.use(cors())
 app.use(express.json())
 app.use('/api/blogs', blogRouter)
 
-module.exports = app;
+module.exports = app
