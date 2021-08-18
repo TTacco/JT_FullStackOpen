@@ -1,4 +1,6 @@
-const blogs = [
+const Blog = require('../models/blog')
+
+const placeholderBlogs = [
   {
     _id: '5a422a851b54a676234d17f7',
     title: 'React patterns',
@@ -27,7 +29,7 @@ const blogs = [
     _id: '5a422b891b54a676234d17fa',
     title: 'First class tests',
     author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html',
     likes: 10,
     __v: 0
   },
@@ -46,7 +48,29 @@ const blogs = [
     url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
     likes: 2,
     __v: 0
+  },
+  {
+    _id: '5a422bc61b54a676234d17fd',
+    title: 'Meep',
+    author: 'EBIC GAMER BOMENT',
+    url: 'QUAKELIVE',
+    __v: 0
   }  
 ]
 
-module.exports = blogs
+const nonExistingId = async () => {
+  const blog = new Blog({ Author: 'willremovethissoon', url: 'placeholderurl'})
+  await blog.save()
+  await blog.remove()
+
+  return blog._id.toString()
+}
+
+const blogsInDB = async () => {
+  const blogs = await Blog.find({})
+  return blogs.map(blog => blog.toJSON())
+}
+
+module.exports = {
+  placeholderBlogs, nonExistingId, blogsInDB
+}

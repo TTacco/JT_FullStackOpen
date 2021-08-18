@@ -1,34 +1,14 @@
-const palindrome = (string) => {
-  return string
-    .split('')
-    .reverse()
-    .join('')
-}
-  
-const average = (array) => {
-  const reducer = (sum, item) => {
-    return sum + item
-  }
-  
-  return array.length === 0
-    ? 0
-    : array.reduce(reducer, 0) / array.length
-}
-  
-const dummy = (array) => {
-  return 1
-}
-
+//Get every single blog's total likes
 const totalLikes = (array) => {
-
   return array.reduce((total, currentBlog) => total + currentBlog.likes, 0)
 }
 
-
+//Blog with the highest likes
 const favoriteBlog = (array) => {
   return array.reduce((highest, currVal) => {return (currVal > highest)? currVal : highest} , 0) 
 }
 
+//Get the person that has written the most amount of blogs
 const mostBlogs = (array) => {
   const amountOfBlogsPerAuthor = {}
 
@@ -75,14 +55,6 @@ const mostLikes = (array) => {
     }
   })
 
-  //An array containing individual arrays of ["key", value] is iterated through
-  /* 
-    amountOfBlogsPerAuthor = [
-      ["Author Name", 4],
-      ["Mr Watson", 7],
-      ["James", 2],
-    ]
-  */
   const bestBlog = Object.entries(amountOfBlogsPerAuthor).reduce((bestPair, currPair) => {
     return (!bestPair || currPair[1] > bestPair[1]) ? currPair : bestPair 
   }, null)
@@ -94,9 +66,6 @@ const mostLikes = (array) => {
 
 
 module.exports = {
-  palindrome,
-  average,
-  dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,

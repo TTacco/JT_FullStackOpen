@@ -1,4 +1,4 @@
-const totalLikes = require('../utils/for_testing').totalLikes
+const totalLikes = require('../utils/testing_helper').totalLikes
 
 describe('Total likes of a list of blogs', () => {
   test('Example array of blog objects', () => {
