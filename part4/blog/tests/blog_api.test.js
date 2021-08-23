@@ -1,37 +1,18 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
-const helper = require('./blogtest_helper')
+const helper = require('./test_helper')
+const Blog = require('../models/blog')
+const User = require('../models/user')
+const api = supertest(app)
 require('express-async-errors')
 
-const api = supertest(app)
-
-const Blog = require('../models/blog')
-    
 beforeEach(async () => {  
   await Blog.deleteMany({})  
 
   const blogMap = helper.placeholderBlogs.map(blog => new Blog(blog))
   const blogPromises = blogMap.map(blogPromise => blogPromise.save())
   await Promise.all(blogPromises)
-})
-
-test('notes are returned as json', async () => {
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-})
-
-test('there are two notes', async () => {
-  const response = await api.get('/api/blogs')
-  expect(response.body).toHaveLength(helper.placeholderBlogs.length)
-})
-  
-test('the first note is about HTTP methods', async () => {
-  const response = await api.get('/api/blogs') 
-  
-  expect(response.body[0].author).toBe('Michael Chan')
 })
 
 test('BLOG Working Addition', async () => {
@@ -68,7 +49,8 @@ test('BLOG Verify Likes Param', async () => {
   const blog = await Blog.findById(id)
 
   if(!blog.likes){
-    await Blog.findByIdAndUpdate(id, {likes: 0})
+    blog.likes = 0
+    await blog.save('/api/blogs')
   }
 
 })
@@ -97,8 +79,6 @@ test('BLOG delete test', async () => {
   await api.delete(`/api/blogs/${id}`)
   //console.log(api.delete(`api/blogs/${id}`))
 })
-
-
 
 afterAll(() => {
   mongoose.connection.close()
