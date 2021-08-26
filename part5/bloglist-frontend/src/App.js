@@ -8,12 +8,16 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
 
-  /* useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
-  }, []) */
+  useEffect(() => {
+    const fetchBlogs = async() => {
+      const blogs = await blogService.getAll()
+      setBlogs(blogs)
+    }
+    fetchBlogs()
+
+  }, [])
 
   const stateChanger = (stateChange) => {
     return function(event){
@@ -24,12 +28,27 @@ const App = () => {
   const loginUser = async (event) => {
     event.preventDefault()
     console.log(`Logging in as ${username} with password as ${password}`)
-    console.log(await loginService.login(username, password))
+    try{
+      const userLoggedIn = await loginService.login(username, password)
+      setUser(setUser(userLoggedIn))
+
+      window.localStorage.setItem('loggedBlogUser', JSON.stringify(userLoggedIn)) 
+      loginService.setToken(userLoggedIn.token)
+    }
+    catch(e){
+      console.log("Invalid Credentials")
+    }
     setUsername('')
     setPassword('')
   }
 
-  return (
+  const logoutUser = () => {
+    window.localStorage.removeItem('loggedBlogUser') 
+    setUser(null)
+  }
+
+
+  const renderLoginForm = () => (
     <div>
       <h2>Login</h2>
       <form className='debug form'>
@@ -43,12 +62,30 @@ const App = () => {
         </div>
         <button onClick={loginUser}>Login</button>
       </form>
-      <div>
+    </div>
+  )
+
+  const renderLogStatus = () => (
+    <div>
+      <h2>User has logged in</h2>
+      <button onClick={logoutUser}>Logout</button>
+    </div>
+  )
+
+  const renderBlogs = () => (
+    <div>
       <h2>blogs</h2>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
-      </div>
+    </div>
+  )
+
+  return (
+    <div>
+      {user === null && renderLoginForm()}
+      {user !== null && renderLogStatus()}
+      {renderBlogs()}
     </div>
   )
 }
