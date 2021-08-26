@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const blogRouter = require('./controllers/blog-controller')
 const userRouter = require('./controllers/user-controller')
+const loginRouter = require('./controllers/login-controller')
 const logger = require('./utils/logger')
 const config = require('./utils/config')
 const middleware = require('./utils/middleware')
@@ -27,6 +28,7 @@ app.use(middleware.tokenExtractor)
 
 app.use('/api/blogs', middleware.userExtractor, blogRouter)
 app.use('/api/users', userRouter)
+app.use('/api/login', loginRouter)
 
 app.use(middleware.errorHandler)
 
