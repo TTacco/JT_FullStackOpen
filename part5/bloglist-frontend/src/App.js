@@ -10,30 +10,38 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
+  //New Blog States
+  const [newBlogTitle, setNewBlogTitle] = useState('')
+  const [newBlogAuthor, setNewBlogAuthor] = useState('')
+  const [newBlogURL, setNewBlogURL] = useState('')
+
+
   useEffect(() => {
     const fetchBlogs = async() => {
       const blogs = await blogService.getAll()
       setBlogs(blogs)
     }
-    fetchBlogs()
+    fetchBlogs()  
 
   }, [])
 
-  const stateChanger = (stateChange) => {
+  //Receives a callback function to be used to change 
+  const updateState = (stateChange) => {
     return function(event){
       stateChange(event.target.value)
     }
   }
 
+  //===FORM ACTION METHODS===
   const loginUser = async (event) => {
     event.preventDefault()
     console.log(`Logging in as ${username} with password as ${password}`)
     try{
       const userLoggedIn = await loginService.login(username, password)
-      setUser(setUser(userLoggedIn))
+      setUser(userLoggedIn)
 
       window.localStorage.setItem('loggedBlogUser', JSON.stringify(userLoggedIn)) 
-      loginService.setToken(userLoggedIn.token)
+      blogService.setToken(userLoggedIn.token)
     }
     catch(e){
       console.log("Invalid Credentials")
@@ -47,28 +55,51 @@ const App = () => {
     setUser(null)
   }
 
+  const createNewBlog = async (event) => {
+    event.preventDefault()
+    const newBlogObj = {
+      title: newBlogTitle,
+      author: newBlogAuthor,
+      url: newBlogURL
+    }
+    console.log(await blogService.createBlog(newBlogObj))
+    alert('CREATING NEW BLOG')
+  }
 
+  //===RENDER METHODS===
   const renderLoginForm = () => (
     <div>
       <h2>Login</h2>
-      <form className='debug form'>
-        <div className='form-elements'>
+      <form className='debug form-login'>
+        <div>
           <label>USERNAME: </label> 
-          <input value={username} onChange={stateChanger(setUsername)}/>
+          <input value={username} onChange={updateState(setUsername)}/>
         </div>
-        <div className='form-elements'>
+        <div>
           <label>PASSWORD: </label> 
-          <input value={password} onChange={stateChanger(setPassword)}/>
+          <input value={password} onChange={updateState(setPassword)}/>
         </div>
         <button onClick={loginUser}>Login</button>
       </form>
     </div>
   )
 
-  const renderLogStatus = () => (
+  const renderLoggedUserInfo = () => (
     <div>
-      <h2>User has logged in</h2>
-      <button onClick={logoutUser}>Logout</button>
+      <div>
+        <h2>Welcome: {user.name}</h2>
+        <button onClick={logoutUser}>Logout</button>   
+      </div>
+      <h4>CREATE NEW BLOG</h4>
+      <form className='form-createnewblog'>
+        <label>Title</label>
+        <input value={newBlogTitle} onChange={updateState(setNewBlogTitle)}/>
+        <label>Author</label>
+        <input value={newBlogAuthor} onChange={updateState(setNewBlogAuthor)}/>
+        <label>URL</label>
+        <input value={newBlogURL} onChange={updateState(setNewBlogURL)}/> 
+        <button onClick={createNewBlog}>Create Blog</button>
+      </form>
     </div>
   )
 
@@ -84,7 +115,7 @@ const App = () => {
   return (
     <div>
       {user === null && renderLoginForm()}
-      {user !== null && renderLogStatus()}
+      {user !== null && renderLoggedUserInfo()}
       {renderBlogs()}
     </div>
   )

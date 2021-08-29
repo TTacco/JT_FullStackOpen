@@ -2,9 +2,11 @@
     border: 1px solid red
 }
 
-.form {
+.form-login {
     padding: 20px;
 }
 
-.form-elements {
+.form-createnewblog * {
+    display: block;
+    margin: 5px 0px;
 }
